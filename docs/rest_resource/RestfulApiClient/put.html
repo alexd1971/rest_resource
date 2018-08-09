@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="API docs for the put method from the RestfulApiClient class, for the Dart programming language.">
+  <title>put method - RestfulApiClient class - rest_resource library - Dart API</title>
+  <!-- required because all the links are pseudo-absolute -->
+  <base href="../..">
+
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500,400i,400,300|Source+Sans+Pro:400,300,700" rel="stylesheet">
+  <link rel="stylesheet" href="static-assets/github.css">
+  <link rel="stylesheet" href="static-assets/styles.css">
+  <link rel="icon" href="static-assets/favicon.png">
+
+</head>
+
+<body>
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <button id="sidenav-left-toggle" type="button">&nbsp;</button>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="index.html">rest_resource</a></li>
+    <li><a href="rest_resource/rest_resource-library.html">rest_resource</a></li>
+    <li><a href="rest_resource/RestfulApiClient-class.html">RestfulApiClient</a></li>
+    <li class="self-crumb">put method</li>
+  </ol>
+  <div class="self-name">put</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<main>
+
+  <div class="col-xs-6 col-sm-3 col-md-2 sidebar sidebar-offcanvas-left">
+    <h5>RestfulApiClient class</h5>
+    <ol>
+      <li class="section-title"><a href="rest_resource/RestfulApiClient-class.html#constructors">Constructors</a></li>
+      <li><a href="rest_resource/RestfulApiClient/RestfulApiClient.html">RestfulApiClient</a></li>
+    
+      <li class="section-title inherited">
+        <a href="rest_resource/RestfulApiClient-class.html#instance-properties">Properties</a>
+      </li>
+      <li class="inherited"><a href="rest_resource/RestfulApiClient/hashCode.html">hashCode</a></li>
+      <li class="inherited"><a href="rest_resource/RestfulApiClient/runtimeType.html">runtimeType</a></li>
+    
+      <li class="section-title"><a href="rest_resource/RestfulApiClient-class.html#instance-methods">Methods</a></li>
+      <li><a href="rest_resource/RestfulApiClient/addHeaders.html">addHeaders</a></li>
+      <li><a href="rest_resource/RestfulApiClient/delete.html">delete</a></li>
+      <li><a href="rest_resource/RestfulApiClient/get.html">get</a></li>
+      <li><a href="rest_resource/RestfulApiClient/patch.html">patch</a></li>
+      <li><a href="rest_resource/RestfulApiClient/post.html">post</a></li>
+      <li><a href="rest_resource/RestfulApiClient/put.html">put</a></li>
+      <li><a href="rest_resource/RestfulApiClient/removeHeader.html">removeHeader</a></li>
+      <li class="inherited"><a href="rest_resource/RestfulApiClient/noSuchMethod.html">noSuchMethod</a></li>
+      <li class="inherited"><a href="rest_resource/RestfulApiClient/toString.html">toString</a></li>
+    
+      <li class="section-title inherited"><a href="rest_resource/RestfulApiClient-class.html#operators">Operators</a></li>
+      <li class="inherited"><a href="rest_resource/RestfulApiClient/operator_equals.html">operator ==</a></li>
+    
+    
+    
+    </ol>
+  </div><!--/.sidebar-offcanvas-->
+
+  <div class="col-xs-12 col-sm-9 col-md-8 main-content">
+    <h1>put method</h1>
+
+    <section class="multi-line-signature">
+      <span class="returntype">Future<span class="signature">&lt;<wbr><span class="type-parameter"><a href="rest_resource/ApiResponse-class.html">ApiResponse</a></span>&gt;</span></span>
+      <span class="name ">put</span>
+(<wbr>{<span class="parameter" id="put-param-resourcePath"><span class="type-annotation">String</span> <span class="parameter-name">resourcePath</span>, </span> <span class="parameter" id="put-param-body"><span class="type-annotation">Map<span class="signature">&lt;<wbr><span class="type-parameter">String</span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">body</span></span> })
+    </section>
+    <section class="desc markdown">
+      <p>Выполняет PUT-запрос к API-серверу.</p>
+<p><code>resourcePath</code> - путь к ресурсу на API-сервере.</p>
+<p><code>body</code> - тело запроса. В теле запроса передаются данные объекта.</p>
+<p><code>Content-Type</code> запроса всегда <code>application/json</code>. Поэтому тело запроса должно преобразовываться
+в JSON-строку с помощью <code>json.decode()</code></p>
+<p>Все объекты <code>body</code> могут быть:</p><ul><li>простыми данными числового и строкового типа</li><li>объектами типа <code>DateTime</code></li><li>объектами, реализующими интерфейс <a href="rest_resource/JsonEncodable-class.html">JsonEncodable</a></li><li>списками (<code>List</code>) перечисленных выше типов</li></ul>
+<p>Возвращает <code>Future</code> с <a href="rest_resource/ApiResponse-class.html">ApiResponse</a></p>
+    </section>
+    
+    <section class="summary source-code" id="source">
+      <h2><span>Implementation</span> </h2>
+      <pre class="language-dart"><code class="language-dart">Future&lt;ApiResponse&gt; put(
+    {String resourcePath, Map&lt;String, dynamic&gt; body}) async {
+  final response = await _httpClient.put(_apiUri.replace(path: resourcePath),
+      headers: _headers, body: json.encode(body, toEncodable: _toEncodable));
+
+  return ApiResponse(
+      statusCode: response.statusCode,
+      reasonPhrase: response.reasonPhrase,
+      headers: response.headers,
+      body: response.body.isNotEmpty ? json.decode(response.body) : &#39;&#39;);
+}</code></pre>
+    </section>
+
+  </div> <!-- /.main-content -->
+
+  <div class="col-xs-6 col-sm-6 col-md-2 sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    rest_resource 0.0.1
+  </span>
+
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="static-assets/typeahead.bundle.min.js"></script>
+<script src="static-assets/highlight.pack.js"></script>
+<script src="static-assets/URI.js"></script>
+<script src="static-assets/script.js"></script>
+
+
+</body>
+
+</html>

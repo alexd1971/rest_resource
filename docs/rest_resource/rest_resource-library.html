@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="rest_resource library API docs, for the Dart programming language.">
+  <title>rest_resource library - Dart API</title>
+  <!-- required because all the links are pseudo-absolute -->
+  <base href="..">
+
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500,400i,400,300|Source+Sans+Pro:400,300,700" rel="stylesheet">
+  <link rel="stylesheet" href="static-assets/github.css">
+  <link rel="stylesheet" href="static-assets/styles.css">
+  <link rel="icon" href="static-assets/favicon.png">
+
+</head>
+
+<body>
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <button id="sidenav-left-toggle" type="button">&nbsp;</button>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="index.html">rest_resource</a></li>
+    <li class="self-crumb">rest_resource library</li>
+  </ol>
+  <div class="self-name">rest_resource</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<main>
+
+  <div class="col-xs-6 col-sm-3 col-md-2 sidebar sidebar-offcanvas-left">
+    <h5><span class="package-name">rest_resource</span> <span class="package-kind">package</span></h5>
+    <ol>
+          <li class="section-title">Libraries</li>
+          <li><a href="rest_resource/rest_resource-library.html">rest_resource</a></li>
+    </ol>
+  </div>
+
+  <div class="col-xs-12 col-sm-9 col-md-8 main-content">
+    <h1>rest_resource library</h1>
+
+    <section class="desc markdown">
+      <p>Поддержка работы с REST-ресурсами на стороне клиента.</p>
+<h2>Назначение</h2>
+<p>Библиотека предназначена для создания REST-клиентов (поддерживаются web- и mobile-клиенты)</p>
+<h2>Структура</h2>
+<p>В основе библиотеки лежит класс <code>RestResource</code>, который для общения с API-сервером использует <code>RestfulApiClient</code>. Объекты, с которыми работает <code>RestResource</code> должны реализовывать интерфейс <code>JsonEncodable</code></p>
+<p><code>RestResource</code> изначально поддерживает стандартные методы (CRUD) работы с REST-ресурсами:</p><ul><li><code>create</code> - создание объекта</li><li><code>read</code> - получение объекта/списка объектов</li><li><code>update</code> - частичное обновление данных объекта</li><li><code>replace</code> - полная замена данных объекта</li><li><code>delete</code> - удаление объекта</li></ul>
+<p>При наследовании ресурсы можно дополнять другими необходимыми методами.</p>
+<h2>Примеры использования</h2>
+<pre class="language-dart"><code>import 'dart:async';
+import 'dart:io';
+
+import 'package:http/browser_client.dart';
+
+import 'package:rest_resource/rest_resource.dart';
+
+/// Идентификатор пользователя
+class UserId extends ObjectId {
+  UserId(id) : super(id);
+}
+
+/// Пользователь
+class User implements JsonEncodable {
+  UserId _id;
+
+  /// Идентификтор
+  UserId get id =&gt; _id;
+
+  /// Имя пользователя
+  String userName;
+
+  /// Фамилия
+  String lastName;
+
+  /// Имя
+  String firstName;
+
+  /// Полное имя
+  String get fullName =&gt; '$firstName $lastName';
+
+  /// Дата рождения
+  DateTime birthDate;
+
+  /// Создает пользователя
+  User({this.userName, this.lastName, this.firstName, this.birthDate});
+
+  /// Создает пользователя из JSON-данных
+  User.fromJson(Map&lt;String, dynamic&gt; json)
+      : _id = json['id'],
+        userName = json['username'],
+        lastName = json['lastname'],
+        firstName = json['firstname'],
+        birthDate = DateTime.parse(json['birth_date']);
+
+  dynamic toJson() {
+    Map&lt;String, dynamic&gt; result = {
+      'id': _id,
+      'username': userName,
+      'lastname': lastName,
+      'firstname': firstName,
+      'birth_date': birthDate
+    };
+    // Перед возвратом результата полезно удалить все пустые атрибуты:
+    // * уменьшается трафик
+    // * не захламляется база
+    // * легко реализуется частичное обновление данных объекта
+    return result..removeWhere((key, value) =&gt; value == null);
+  }
+}
+
+/// Ресурс Users
+///
+/// Оперирует с объектами [User].
+/// В дополнение к стандартным CRUD-методам реализует методы:
+/// * `login` - вход в систему
+/// * `logout` - выход из системы
+class Users extends RestResource&lt;User&gt; {
+  Users(RestfulApiClient apiClient)
+      : super(resourcePath: '/users', apiClient: apiClient);
+
+  User createObject(Map&lt;String, dynamic&gt; json) =&gt; User.fromJson(json);
+
+  /// Осуществляет вход в систему
+  Future&lt;User&gt; login(String username, String password) async {
+    final response = await apiClient.post(
+        resourcePath: '$resourcePath/login',
+        body: {'username': username, 'password': password});
+    if (response.statusCode != HttpStatus.ok) {
+      throw (response.reasonPhrase);
+    }
+    return User.fromJson(response.body);
+  }
+
+  /// Осуществляет выход из системы
+  Future logout() async {
+    final response = await apiClient.post(resourcePath: '$resourcePath/logout');
+    if (response.statusCode != HttpStatus.ok) {
+      throw (response.reasonPhrase);
+    }
+  }
+}
+
+main() async {
+  final apiClient = RestfulApiClient(
+      apiUri: Uri.http('api.examle.com', '/'), httpClient: BrowserClient());
+  apiClient.addHeaders({'X-Requested-With': 'XMLHttpRequest'});
+
+  final users = Users(apiClient);
+
+  User currentUser;
+  try {
+    currentUser = await users.login('username', 'password');
+  } catch (e) {
+    // Здесь обрабатываем неудачный логин. Причина в e.message.
+  }
+  print('Пользователь ${currentUser.fullName} успешно аутентифицировался');
+
+  final newUser = User(
+      userName: 'newuser',
+      firstName: 'Bob',
+      lastName: 'Martin',
+      birthDate: DateTime(1952));
+
+  User createdUser;
+  try {
+    createdUser = await users.create(newUser);
+  } catch (e) {
+    // Обработка ошибки создания пользователя
+  }
+
+  print('Пользователь ${createdUser.fullName} успешно создан');
+
+  List&lt;User&gt; bobs;
+  try {
+    bobs = await users.read({'firstname': 'Bob'});
+  } catch (e) {
+    // Обработка ошибки получения данных
+  }
+  bobs.forEach((bob) {
+    // Выполняем что-то для пользователей с именем Bob
+    print('${bob.fullName} - ${bob.birthDate}');
+  });
+}
+</code></pre>
+    </section>
+    
+    <section class="summary offset-anchor" id="classes">
+      <h2>Classes</h2>
+
+      <dl>
+        <dt id="ApiResponse">
+          <span class="name "><a href="rest_resource/ApiResponse-class.html">ApiResponse</a></span>
+        </dt>
+        <dd>
+          Ответ API-сервера
+        </dd>
+        <dt id="JsonEncodable">
+          <span class="name "><a href="rest_resource/JsonEncodable-class.html">JsonEncodable</a></span>
+        </dt>
+        <dd>
+          Общий интерфейс для объектов, кодирующихся в JSON-строку <a href="rest_resource/JsonEncodable-class.html">[...]</a>
+        </dd>
+        <dt id="ObjectId">
+          <span class="name "><a href="rest_resource/ObjectId-class.html">ObjectId</a></span>
+        </dt>
+        <dd>
+          Идентификтор ресурса <a href="rest_resource/ObjectId-class.html">[...]</a>
+        </dd>
+        <dt id="RestfulApiClient">
+          <span class="name "><a href="rest_resource/RestfulApiClient-class.html">RestfulApiClient</a></span>
+        </dt>
+        <dd>
+          Restful API клиент <a href="rest_resource/RestfulApiClient-class.html">[...]</a>
+        </dd>
+        <dt id="RestResource">
+          <span class="name "><a href="rest_resource/RestResource-class.html">RestResource</a><span class="signature">&lt;<wbr><span class="type-parameter">T extends <a href="rest_resource/JsonEncodable-class.html">JsonEncodable</a></span>&gt;</span></span>
+        </dt>
+        <dd>
+          Базовый класс для создания REST-ресурсов <a href="rest_resource/RestResource-class.html">[...]</a>
+        </dd>
+      </dl>
+    </section>
+
+
+
+
+
+
+
+  </div> <!-- /.main-content -->
+
+  <div class="col-xs-6 col-sm-6 col-md-2 sidebar sidebar-offcanvas-right">
+    <h5>rest_resource library</h5>
+    <ol>
+      <li class="section-title"><a href="rest_resource/rest_resource-library.html#classes">Classes</a></li>
+      <li><a href="rest_resource/ApiResponse-class.html">ApiResponse</a></li>
+      <li><a href="rest_resource/JsonEncodable-class.html">JsonEncodable</a></li>
+      <li><a href="rest_resource/ObjectId-class.html">ObjectId</a></li>
+      <li><a href="rest_resource/RestfulApiClient-class.html">RestfulApiClient</a></li>
+      <li><a href="rest_resource/RestResource-class.html">RestResource</a></li>
+    
+    
+    
+    
+    
+    
+    </ol>
+  </div><!--/sidebar-offcanvas-right-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    rest_resource 0.0.1
+  </span>
+
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="static-assets/typeahead.bundle.min.js"></script>
+<script src="static-assets/highlight.pack.js"></script>
+<script src="static-assets/URI.js"></script>
+<script src="static-assets/script.js"></script>
+
+
+</body>
+
+</html>

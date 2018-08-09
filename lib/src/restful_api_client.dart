@@ -25,7 +25,7 @@ class RestfulApiClient {
       : _httpClient = httpClient,
         _apiUri = apiUri;
 
-  /// Выполняет GET-запрос к API-серверу. Получение данных ресурса.
+  /// Выполняет GET-запрос к API-серверу.
   ///
   /// `resourcePath` - путь к ресурсу на API-сервере
   ///
@@ -45,7 +45,7 @@ class RestfulApiClient {
         body: response.body.isNotEmpty ? json.decode(response.body) : '');
   }
 
-  /// Выполняет POST-запрос к API-серверу. Создание нового объекта ресурса.
+  /// Выполняет POST-запрос к API-серверу.
   ///
   /// `resourcePath` - путь к ресурсу на API-сервере.
   ///
@@ -77,7 +77,7 @@ class RestfulApiClient {
         body: response.body.isNotEmpty ? json.decode(response.body) : '');
   }
 
-  /// Выполняет PUT-запрос к API-серверу. Обновление (замена) объекта ресурса.
+  /// Выполняет PUT-запрос к API-серверу.
   ///
   /// `resourcePath` - путь к ресурсу на API-сервере.
   ///
@@ -106,7 +106,7 @@ class RestfulApiClient {
         body: response.body.isNotEmpty ? json.decode(response.body) : '');
   }
 
-  /// Выполняет PATCH-запрос к API-серверу. Частичное обновление данных объекта
+  /// Выполняет PATCH-запрос к API-серверу.
   ///
   /// `resourcePath` - путь к ресурсу на API-сервере.
   ///
