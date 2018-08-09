@@ -9,36 +9,36 @@ hybridMain(StreamChannel channel) async {
   final server = await HttpServer.bind(InternetAddress.loopbackIPv4, port);
   channel.sink.add('${server.address.address}:${server.port}');
   await for (HttpRequest request in server) {
+    request.response.headers
+      ..add('Access-Control-Allow-Origin', '*')
+      ..add('Access-Control-Allow-Methods',
+          'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+      ..add('Access-Control-Allow-Headers',
+          'Origin, X-Requested-With, Content-Type, Accept');
 
-    request.response.headers..
-      add('Access-Control-Allow-Origin', '*')..
-      add('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')..
-      add('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-
-    if (request.method != 'OPTIONS'){
-
+    if (request.method != 'OPTIONS') {
       if (request.headers.value('X-Requested-With') != 'XMLHttpRequest') {
         request.response.statusCode = HttpStatus.badRequest;
         request.response.write('Not AJAX-request');
       } else {
-
         switch (request.requestedUri.pathSegments[0]) {
           case 'unauthorized':
             request.response.statusCode = HttpStatus.unauthorized;
-            request.response.reasonPhrase = '${HttpStatus.unauthorized}-Unauthorized';
+            request.response.reasonPhrase =
+                '${HttpStatus.unauthorized}-Unauthorized';
             break;
           case 'servererror':
             request.response.statusCode = HttpStatus.internalServerError;
-            request.response.reasonPhrase = '${HttpStatus.internalServerError}-Internal Server Error';
+            request.response.reasonPhrase =
+                '${HttpStatus.internalServerError}-Internal Server Error';
             break;
           case 'echo-resource':
-            switch(request.method) {
+            switch (request.method) {
               case 'GET':
               case 'DELETE':
-                if (request.uri.queryParameters.isEmpty && request.uri.pathSegments.length > 1) {
-                  request.response.write(json.encode({
-                    'id': 1
-                  }));
+                if (request.uri.queryParameters.isEmpty &&
+                    request.uri.pathSegments.length > 1) {
+                  request.response.write(json.encode({'id': 1}));
                 } else {
                   request.response.write(json.encode([
                     {'id': 1},
@@ -57,10 +57,8 @@ hybridMain(StreamChannel channel) async {
           default:
             switch (request.method) {
               case 'GET':
-                request.response.write(json.encode({
-                  'method': 'GET',
-                  'uri': '${request.requestedUri}'
-                }));
+                request.response.write(json.encode(
+                    {'method': 'GET', 'uri': '${request.requestedUri}'}));
                 break;
               case 'POST':
                 String body = await request.transform(utf8.decoder).join();
@@ -87,14 +85,11 @@ hybridMain(StreamChannel channel) async {
                 }));
                 break;
               case 'DELETE':
-                request.response.write(json.encode({
-                  'method': 'DELETE',
-                  'uri': '${request.requestedUri}'
-                }));
+                request.response.write(json.encode(
+                    {'method': 'DELETE', 'uri': '${request.requestedUri}'}));
                 break;
             }
         }
-        
       }
     }
     request.response.close();

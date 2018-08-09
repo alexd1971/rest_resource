@@ -1,13 +1,16 @@
+/// Ответ API-сервера
 class ApiResponse {
+  /// Http-статус ответа
   final int statusCode;
-  final Map<String, String> headers;
-  final String reasonPhrase;
-  final data;
 
-  ApiResponse({
-    this.statusCode,
-    this.headers,
-    this.reasonPhrase,
-    this.data
-  });
+  /// Заголовки ответа
+  final Map<String, String> headers;
+
+  /// Сообщение сервера
+  final String reasonPhrase;
+
+  /// Тело ответа
+  final body;
+
+  ApiResponse({this.statusCode, this.headers, this.reasonPhrase, this.body});
 }

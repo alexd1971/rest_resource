@@ -6,29 +6,25 @@ import 'package:http/http.dart';
 import 'package:rest_resource/rest_resource.dart';
 
 class TestResource extends RestResource<TestResourceObject> {
+  TestResource({@required RestfulApiClient apiClient})
+      : super(resourcePath: 'echo-resource', apiClient: apiClient);
 
-  TestResource({
-    @required RestfulApiClient apiClient
-  }): super(
-    resourcePath: 'echo-resource',
-    apiClient: apiClient
-  );
-
-  TestResourceObject createObject(Map<String,dynamic> json) => TestResourceObject.fromJson(json);
+  TestResourceObject createObject(Map<String, dynamic> json) =>
+      TestResourceObject.fromJson(json);
 }
 
 class TestResourceObject implements JsonEncodable {
-  Map<String,dynamic> _data;
-  
-  TestResourceObject.fromJson(Map<String,dynamic> json): _data = json;
+  Map<String, dynamic> _data;
 
-  Map<String,dynamic> toJson() => _data;
+  TestResourceObject.fromJson(Map<String, dynamic> json) : _data = json;
+
+  Map<String, dynamic> toJson() => _data;
 
   @override
-  bool operator== (other) {
+  bool operator ==(other) {
     if (other is TestResourceObject) {
       return other._data.keys.every((key) => _data.containsKey(key)) &&
-        _data.keys.every((key) => _data[key] == other._data[key]);
+          _data.keys.every((key) => _data[key] == other._data[key]);
     }
     return false;
   }
@@ -38,25 +34,20 @@ class TestResourceObject implements JsonEncodable {
 }
 
 class TestResourceObjectId extends ObjectId {
-  TestResourceObjectId(id): super(id);
+  TestResourceObjectId(id) : super(id);
 }
 
 void main() {
   TestResource testResource;
-  final newObject = new TestResourceObject.fromJson({'test': 'create object'});
+  final newObject = TestResourceObject.fromJson({'test': 'create object'});
 
   setUpAll(() async {
     final channel = spawnHybridUri('helpers/http_server.dart', stayAlive: true);
     final String hostPort = await channel.stream.first;
-    final apiUri = new Uri.http(hostPort, '/');
-    final apiClient = new RestfulApiClient(
-      apiUri: apiUri,
-      httpClient: IOClient()
-    );
-    apiClient.addHeaders({
-      'X-Requested-With': 'XMLHttpRequest'
-    });
-    testResource = new TestResource(apiClient: apiClient);
+    final apiUri = Uri.http(hostPort, '/');
+    final apiClient = RestfulApiClient(apiUri: apiUri, httpClient: IOClient());
+    apiClient.addHeaders({'X-Requested-With': 'XMLHttpRequest'});
+    testResource = TestResource(apiClient: apiClient);
   });
 
   test('create object', () async {
@@ -72,40 +63,30 @@ void main() {
   });
 
   test('get object', () async {
-    expect(
-      testResource.read(new TestResourceObjectId(1)),
-      completion(new TestResourceObject.fromJson({
-        'id': 1
-      }))
-    );
+    expect(testResource.read(TestResourceObjectId(1)),
+        completion(TestResourceObject.fromJson({'id': 1})));
   });
 
   test('get objects by query', () async {
     expect(
-      testResource.read({'all': 'true'}),
-      completion(containsAll([
-        new TestResourceObject.fromJson({'id': 1}),
-        new TestResourceObject.fromJson({'id': 2})
-      ]))
-    );
+        testResource.read({'all': 'true'}),
+        completion(containsAll([
+          TestResourceObject.fromJson({'id': 1}),
+          TestResourceObject.fromJson({'id': 2})
+        ])));
   });
 
   test('delete object', () async {
-    expect(
-      testResource.delete(new TestResourceObjectId(1)),
-      completion(new TestResourceObject.fromJson({
-        'id': 1
-      }))
-    );
+    expect(testResource.delete(TestResourceObjectId(1)),
+        completion(TestResourceObject.fromJson({'id': 1})));
   });
 
   test('delete objects by query', () async {
     expect(
-      testResource.delete({'all': 'true'}),
-      completion(containsAll([
-        new TestResourceObject.fromJson({'id': 1}),
-        new TestResourceObject.fromJson({'id': 2})
-      ]))
-    );
+        testResource.delete({'all': 'true'}),
+        completion(containsAll([
+          TestResourceObject.fromJson({'id': 1}),
+          TestResourceObject.fromJson({'id': 2})
+        ])));
   });
 }

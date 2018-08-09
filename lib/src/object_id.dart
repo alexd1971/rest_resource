@@ -3,20 +3,20 @@ import 'package:quiver/core.dart';
 import 'json_encodable.dart';
 
 /// Идентификтор ресурса
-/// 
+///
 /// Инкапсулирует идентификатор любого типа. Позволяет выполнять сравнение идентификаторов.
-/// 
+///
 /// Предпочтительно для каждого ресурса создавать новый класс на основе [ObjectId].
-/// 
+///
 /// Пример:
-/// 
+///
 ///     class UserId extends ObjectId {
 ///       UserId(id): super(id);
 ///     }
 class ObjectId implements JsonEncodable {
   final _id;
 
-  ObjectId(id): _id = id;
+  ObjectId(id) : _id = id;
 
   /// Исходное значение идентификатора
   dynamic get value => _id;
@@ -27,11 +27,11 @@ class ObjectId implements JsonEncodable {
     }
     return _id.toString();
   }
-  
+
   @override
-  bool operator== (other) {
+  bool operator ==(other) {
     if (other is ObjectId) {
-      return this.runtimeType == other.runtimeType &&  _id == other._id;
+      return this.runtimeType == other.runtimeType && _id == other._id;
     }
     return false;
   }
@@ -41,5 +41,4 @@ class ObjectId implements JsonEncodable {
 
   @override
   String toString() => _id.toString();
-
 }
