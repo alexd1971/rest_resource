@@ -160,19 +160,29 @@ class RestfulApiClientTests {
     });
 
     test('toEncodable()', () async {
-      final now = DateTime.now();
+      final encodable = new EncodableTest();
       final response = await restfulApiClient.post(
         resourcePath: '/echo-resource',
-        body: {
-          'id': ObjectId('ObjectId'),
-          'date': now
-        }
+        body: {'test': encodable}
       );
       expect(response.statusCode, HttpStatus.ok);
       expect(response.data, {
-        'id': 'ObjectId',
-        'date': now.toUtc().toIso8601String()
+        'test': {
+          'id': 1234567890,
+          'date': encodable.date.toUtc().toIso8601String()
+        }
       });
     });
+  }
+}
+
+class EncodableTest implements JsonEncodable {
+  final id = ObjectId(1234567890);
+  final date = DateTime.now();
+  dynamic toJson() {
+    return {
+      'id': id,
+      'date': date
+    };
   }
 }

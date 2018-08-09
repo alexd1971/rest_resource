@@ -21,7 +21,12 @@ class ObjectId implements JsonEncodable {
   /// Исходное значение идентификатора
   dynamic get value => _id;
 
-  toJson() => _id.toString();
+  dynamic toJson() {
+    if (_id is num || _id is String) {
+      return _id;
+    }
+    return _id.toString();
+  }
   
   @override
   bool operator== (other) {
