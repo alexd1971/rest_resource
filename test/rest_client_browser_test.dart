@@ -4,7 +4,7 @@
 import 'package:test/test.dart';
 import 'package:http/browser_client.dart';
 
-import 'helpers/restful_api_client_tests.dart';
+import 'helpers/rest_client_tests.dart';
 
 void main() {
   RestClientTests(BrowserClient()).run();

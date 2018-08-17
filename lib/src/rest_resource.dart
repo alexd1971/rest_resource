@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:meta/meta.dart';
 
 import 'api_response.dart';
-import 'restful_api_client.dart';
+import 'rest_client.dart';
 import 'json_encodable.dart';
 import 'object_id.dart';
 
