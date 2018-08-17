@@ -66,7 +66,7 @@ class User implements JsonEncodable {
 /// * `login` - вход в систему
 /// * `logout` - выход из системы
 class Users extends RestResource<User> {
-  Users(RestfulApiClient apiClient)
+  Users(RestClient apiClient)
       : super(resourcePath: '/users', apiClient: apiClient);
 
   User createObject(Map<String, dynamic> json) => User.fromJson(json);
@@ -92,7 +92,7 @@ class Users extends RestResource<User> {
 }
 
 main() async {
-  final apiClient = RestfulApiClient(
+  final apiClient = RestClient(
       apiUri: Uri.http('api.examle.com', '/'), httpClient: BrowserClient());
   apiClient.addHeaders({'X-Requested-With': 'XMLHttpRequest'});
 

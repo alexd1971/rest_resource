@@ -9,19 +9,19 @@ import 'json_encodable.dart';
 /// Restful API клиент
 ///
 /// Реализует базовые методы Restful API
-class RestfulApiClient {
+class RestClient {
   final http.Client _httpClient;
   final Uri _apiUri;
   final _headers = <String, String>{};
 
-  /// Создает новый RestfulApiClient
+  /// Создает новый RestClient
   ///
   /// `apiUri` - адрес API-сервера
   /// `httpClient` - используемый http-клиент:
   ///
   /// * [BrowserClient] - при использовании в браузере
   /// * [IOClient] - при использовании во Flutter или VM
-  RestfulApiClient({Uri apiUri, http.Client httpClient})
+  RestClient({Uri apiUri, http.Client httpClient})
       : _httpClient = httpClient,
         _apiUri = apiUri;
 

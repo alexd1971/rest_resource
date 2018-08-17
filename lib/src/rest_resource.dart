@@ -24,7 +24,7 @@ abstract class RestResource<T extends JsonEncodable> {
 
   /// API-клиент
   @protected
-  final RestfulApiClient apiClient;
+  final RestClient apiClient;
 
   /// Создает новый ресурс
   RestResource({@required this.resourcePath, @required this.apiClient})

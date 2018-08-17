@@ -18,8 +18,8 @@ main() {
     final mockClient = MockClient();
     when(mockClient.get(apiUri, headers: headers)).thenAnswer(
         (_) => Future.value(Response('GET: $apiUri', HttpStatus.ok)));
-    final restfulApiClient =
-        RestfulApiClient(apiUri: apiUri, httpClient: mockClient);
-    expect(restfulApiClient.get(), completion('GET: $apiUri'));
+    final restClient =
+        RestClient(apiUri: apiUri, httpClient: mockClient);
+    expect(restClient.get(), completion('GET: $apiUri'));
   });
 }

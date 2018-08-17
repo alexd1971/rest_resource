@@ -7,5 +7,5 @@ import 'package:http/http.dart';
 import 'helpers/restful_api_client_tests.dart';
 
 void main() {
-  RestfulApiClientTests(IOClient()).run();
+  RestClientTests(IOClient()).run();
 }

@@ -6,7 +6,7 @@ import 'package:http/http.dart';
 import 'package:rest_resource/rest_resource.dart';
 
 class TestResource extends RestResource<TestResourceObject> {
-  TestResource({@required RestfulApiClient apiClient})
+  TestResource({@required RestClient apiClient})
       : super(resourcePath: 'echo-resource', apiClient: apiClient);
 
   TestResourceObject createObject(Map<String, dynamic> json) =>
@@ -45,7 +45,7 @@ void main() {
     final channel = spawnHybridUri('helpers/http_server.dart', stayAlive: true);
     final String hostPort = await channel.stream.first;
     final apiUri = Uri.http(hostPort, '/');
-    final apiClient = RestfulApiClient(apiUri: apiUri, httpClient: IOClient());
+    final apiClient = RestClient(apiUri: apiUri, httpClient: IOClient());
     apiClient.addHeaders({'X-Requested-With': 'XMLHttpRequest'});
     testResource = TestResource(apiClient: apiClient);
   });

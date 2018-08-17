@@ -4,14 +4,14 @@ import 'package:test/test.dart';
 
 import 'package:rest_resource/rest_resource.dart';
 
-class RestfulApiClientTests {
+class RestClientTests {
   final Client _httpClient;
 
-  RestfulApiClientTests(Client httpClient) : _httpClient = httpClient;
+  RestClientTests(Client httpClient) : _httpClient = httpClient;
 
   void run() {
     Uri apiUri;
-    RestfulApiClient restfulApiClient;
+    RestClient restClient;
     final requestParams = {'param1': 'value1', 'param2': 'value2'};
 
     setUpAll(() async {
@@ -19,13 +19,13 @@ class RestfulApiClientTests {
           spawnHybridUri('helpers/http_server.dart', stayAlive: true);
       final String hostPort = await channel.stream.first;
       apiUri = Uri.http(hostPort, '/');
-      restfulApiClient =
-          RestfulApiClient(apiUri: apiUri, httpClient: _httpClient);
-      restfulApiClient.addHeaders({'X-Requested-With': 'XMLHttpRequest'});
+      restClient =
+          RestClient(apiUri: apiUri, httpClient: _httpClient);
+      restClient.addHeaders({'X-Requested-With': 'XMLHttpRequest'});
     });
 
     test('get request', () async {
-      final response = await restfulApiClient.get(
+      final response = await restClient.get(
           resourcePath: '/resource', queryParameters: requestParams);
       expect(response.statusCode, HttpStatus.ok);
       expect(response.body, {
@@ -37,7 +37,7 @@ class RestfulApiClientTests {
     });
 
     test('post request', () async {
-      final response = await restfulApiClient.post(
+      final response = await restClient.post(
           resourcePath: '/resource', body: requestParams);
       expect(response.statusCode, HttpStatus.ok);
       expect(response.body, {
@@ -52,7 +52,7 @@ class RestfulApiClientTests {
     });
 
     test('put request', () async {
-      final response = await restfulApiClient.put(
+      final response = await restClient.put(
           resourcePath: '/resource', body: requestParams);
       expect(response.statusCode, HttpStatus.ok);
       expect(response.body, {
@@ -67,7 +67,7 @@ class RestfulApiClientTests {
     });
 
     test('patch request', () async {
-      final response = await restfulApiClient.patch(
+      final response = await restClient.patch(
           resourcePath: '/resource', body: requestParams);
       expect(response.statusCode, HttpStatus.ok);
       expect(response.body, {
@@ -82,7 +82,7 @@ class RestfulApiClientTests {
     });
 
     test('delete request', () async {
-      final response = await restfulApiClient.delete(
+      final response = await restClient.delete(
           resourcePath: '/resource', queryParameters: requestParams);
       expect(response.statusCode, HttpStatus.ok);
       expect(response.body, {
@@ -94,14 +94,14 @@ class RestfulApiClientTests {
     });
 
     test('get request with unauthorized response', () async {
-      final response = await restfulApiClient.get(
+      final response = await restClient.get(
           resourcePath: '/unauthorized', queryParameters: requestParams);
       expect(response.statusCode, HttpStatus.unauthorized);
       expect(response.reasonPhrase, '${HttpStatus.unauthorized}-Unauthorized');
     });
 
     test('get request with internal server error response', () async {
-      final response = await restfulApiClient.get(
+      final response = await restClient.get(
           resourcePath: '/servererror', queryParameters: requestParams);
       expect(response.statusCode, HttpStatus.internalServerError);
       expect(response.reasonPhrase,
@@ -109,28 +109,28 @@ class RestfulApiClientTests {
     });
 
     test('post request with unauthorized response', () async {
-      final response = await restfulApiClient.post(
+      final response = await restClient.post(
           resourcePath: '/unauthorized', body: requestParams);
       expect(response.statusCode, HttpStatus.unauthorized);
       expect(response.reasonPhrase, '${HttpStatus.unauthorized}-Unauthorized');
     });
 
     test('put request with unauthorized response', () async {
-      final response = await restfulApiClient.put(
+      final response = await restClient.put(
           resourcePath: '/unauthorized', body: requestParams);
       expect(response.statusCode, HttpStatus.unauthorized);
       expect(response.reasonPhrase, '${HttpStatus.unauthorized}-Unauthorized');
     });
 
     test('patch request with unauthorized response', () async {
-      final response = await restfulApiClient.patch(
+      final response = await restClient.patch(
           resourcePath: '/unauthorized', body: requestParams);
       expect(response.statusCode, HttpStatus.unauthorized);
       expect(response.reasonPhrase, '${HttpStatus.unauthorized}-Unauthorized');
     });
 
     test('delete request with unauthorized response', () async {
-      final response = await restfulApiClient.delete(
+      final response = await restClient.delete(
           resourcePath: '/unauthorized', queryParameters: requestParams);
       expect(response.statusCode, HttpStatus.unauthorized);
       expect(response.reasonPhrase, '${HttpStatus.unauthorized}-Unauthorized');
@@ -138,7 +138,7 @@ class RestfulApiClientTests {
 
     test('toEncodable()', () async {
       final encodable = EncodableTest();
-      final response = await restfulApiClient
+      final response = await restClient
           .post(resourcePath: '/echo-resource', body: {'test': encodable});
       expect(response.statusCode, HttpStatus.ok);
       expect(response.body, {

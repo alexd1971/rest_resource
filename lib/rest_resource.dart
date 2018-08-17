@@ -6,7 +6,7 @@
 ///
 /// ## Структура
 ///
-/// В основе библиотеки лежит класс `RestResource`, который для общения с API-сервером использует `RestfulApiClient`. Объекты, с которыми работает `RestResource` должны реализовывать интерфейс `JsonEncodable`
+/// В основе библиотеки лежит класс `RestResource`, который для общения с API-сервером использует `RestClient`. Объекты, с которыми работает `RestResource` должны реализовывать интерфейс `JsonEncodable`
 ///
 /// `RestResource` изначально поддерживает стандартные методы (CRUD) работы с REST-ресурсами:
 /// * `create` - создание объекта
@@ -87,7 +87,7 @@
 ///     /// * `login` - вход в систему
 ///     /// * `logout` - выход из системы
 ///     class Users extends RestResource<User> {
-///       Users(RestfulApiClient apiClient)
+///       Users(RestClient apiClient)
 ///           : super(resourcePath: '/users', apiClient: apiClient);
 ///
 ///       User createObject(Map<String, dynamic> json) => User.fromJson(json);
@@ -113,7 +113,7 @@
 ///     }
 ///
 ///     main() async {
-///       final apiClient = RestfulApiClient(
+///       final apiClient = RestClient(
 ///           apiUri: Uri.http('api.examle.com', '/'), httpClient: BrowserClient());
 ///       apiClient.addHeaders({'X-Requested-With': 'XMLHttpRequest'});
 ///
