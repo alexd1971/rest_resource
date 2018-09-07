@@ -41,7 +41,7 @@ abstract class RestResource<T extends JsonEncodable> {
   Future<T> create(T obj) async {
     final response =
         await apiClient.post(resourcePath: resourcePath, body: obj.toJson());
-    return _processResponse(response);
+    return processResponse(response);
   }
 
   /// Читает данные ресурса
@@ -67,7 +67,7 @@ abstract class RestResource<T extends JsonEncodable> {
     }
     final response = await apiClient.get(
         resourcePath: path, queryParameters: queryParameters);
-    return _processResponse(response);
+    return processResponse(response);
   }
 
   /// Частично обновляет данные объекта
@@ -79,7 +79,7 @@ abstract class RestResource<T extends JsonEncodable> {
   Future<T> update(T obj) async {
     final response =
         await apiClient.patch(resourcePath: resourcePath, body: obj.toJson());
-    return _processResponse(response);
+    return processResponse(response);
   }
 
   /// Полностью обновляет данные
@@ -91,7 +91,7 @@ abstract class RestResource<T extends JsonEncodable> {
   Future<T> replace(T obj) async {
     final response =
         await apiClient.put(resourcePath: resourcePath, body: obj.toJson());
-    return _processResponse(response);
+    return processResponse(response);
   }
 
   /// Удаляет объект
@@ -118,10 +118,11 @@ abstract class RestResource<T extends JsonEncodable> {
     }
     final response = await apiClient.delete(
         resourcePath: path, queryParameters: queryParameters);
-    return _processResponse(response);
+    return processResponse(response);
   }
 
-  dynamic _processResponse(ApiResponse response) {
+  @protected
+  dynamic processResponse(ApiResponse response) {
     if (response.statusCode != HttpStatus.ok) {
       throw (HttpException(response.reasonPhrase));
     }
