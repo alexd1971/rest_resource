@@ -31,6 +31,10 @@ abstract class RestResource<T extends JsonEncodable> {
       : assert(resourcePath != null),
         assert(apiClient != null);
 
+  /// Заголовки последнего ответа сервера
+  Map<String, String> _responseHeaders = const {};
+  Map<String, String> get responseHeaders => _responseHeaders;
+
   /// Создает новый объект ресурса
   ///
   /// Возвращает [Future] с созданным объектом
@@ -121,6 +125,7 @@ abstract class RestResource<T extends JsonEncodable> {
     if (response.statusCode != HttpStatus.ok) {
       throw (HttpException(response.reasonPhrase));
     }
+    _responseHeaders = new Map.unmodifiable(response.headers);
     if (response.body is Map) {
       return createObject(response.body);
     } else if (response.body is List) {
