@@ -67,7 +67,7 @@ class User implements JsonEncodable {
 /// * `logout` - выход из системы
 class Users extends RestResource<User> {
   Users(RestClient apiClient)
-      : super(resourcePath: '/users', apiClient: apiClient);
+      : super('/users', apiClient);
 
   User createObject(Map<String, dynamic> json) => User.fromJson(json);
 

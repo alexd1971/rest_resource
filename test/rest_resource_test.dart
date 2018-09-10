@@ -7,7 +7,7 @@ import 'package:rest_resource/rest_resource.dart';
 
 class TestResource extends RestResource<TestResourceObject> {
   TestResource({@required RestClient apiClient})
-      : super(resourcePath: 'echo-resource', apiClient: apiClient);
+      : super('echo-resource', apiClient);
 
   TestResourceObject createObject(Map<String, dynamic> json) =>
       TestResourceObject.fromJson(json);

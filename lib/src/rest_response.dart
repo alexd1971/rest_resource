@@ -3,8 +3,9 @@ class RestResponse {
   /// Http-статус ответа
   final int statusCode;
 
-  /// Заголовки ответа
   Map<String, String> _headers;
+
+  /// Заголовки ответа
   Map<String, String> get headers => _headers;
 
   /// Сообщение сервера
@@ -21,6 +22,9 @@ class RestResponse {
     _headers = Map.unmodifiable(headers);
   }
 
+  /// Изменяет параметры ответа
+  /// 
+  /// Возвращает новый объект [RestResponse], в котором параметры изменены на указанные
   RestResponse change(
           {int statusCode,
           String reasonPhrase,

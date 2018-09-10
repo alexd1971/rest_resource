@@ -29,9 +29,18 @@ abstract class RestResource<T extends JsonEncodable> {
   final RestClient apiClient;
 
   /// Создает новый ресурс
-  RestResource({@required this.resourcePath, @required this.apiClient})
-      : assert(resourcePath != null),
-        assert(apiClient != null);
+  /// 
+  /// [resourcePath] путь к ресурсу на API-сервере.
+  /// 
+  /// Если путь будет указан с начальным слэшем: `/resource` (абсолютный путь),
+  /// то это будет путь от корня сервера, /// не зависимо от префикса пути, указанного в [apiClient]
+  /// 
+  /// Если путь будет указан без слэша: `resource`, то этот путь добавится к префиксу пути,
+  /// указанному в [apiClient]
+  RestResource(this.resourcePath, this.apiClient) {
+    if (resourcePath == null) throw (ArgumentError.notNull('resourcePath'));
+    if (apiClient == null) throw (ArgumentError.notNull('apiClient'));
+  }
 
   /// Создает новый объект ресурса
   ///
