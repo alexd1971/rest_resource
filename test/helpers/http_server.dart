@@ -21,7 +21,7 @@ hybridMain(StreamChannel channel) async {
         request.response.statusCode = HttpStatus.badRequest;
         request.response.write('Not AJAX-request');
       } else {
-        switch (request.requestedUri.pathSegments[0]) {
+        switch (request.requestedUri.pathSegments.first) {
           case 'unauthorized':
             request.response.statusCode = HttpStatus.unauthorized;
             request.response.reasonPhrase =

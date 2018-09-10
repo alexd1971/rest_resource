@@ -3,7 +3,9 @@ import 'dart:io';
 
 import 'package:meta/meta.dart';
 
-import 'api_response.dart';
+import 'rest_request.dart';
+import 'rest_response.dart';
+import 'rest_request_method.dart';
 import 'rest_client.dart';
 import 'json_encodable.dart';
 import 'object_id.dart';
@@ -31,16 +33,18 @@ abstract class RestResource<T extends JsonEncodable> {
       : assert(resourcePath != null),
         assert(apiClient != null);
 
-  /// Заголовки последнего ответа сервера
-  Map<String, String> _responseHeaders = const {};
-  Map<String, String> get responseHeaders => _responseHeaders;
-
   /// Создает новый объект ресурса
   ///
   /// Возвращает [Future] с созданным объектом
-  Future<T> create(T obj) async {
-    final response =
-        await apiClient.post(resourcePath: resourcePath, body: obj.toJson());
+  Future<T> create(T obj, {Map<String, String> headers = const {}}) async {
+    if (!(obj is JsonEncodable))
+      throw ArgumentError.value(
+          obj, 'obj', 'Creating object must be JsonEncodable');
+    final response = await apiClient.send(RestRequest(
+        method: RestRequestMethod.post,
+        resourcePath: resourcePath,
+        headers: headers,
+        body: obj.toJson()));
     return processResponse(response);
   }
 
@@ -55,7 +59,7 @@ abstract class RestResource<T extends JsonEncodable> {
   ///
   /// Если методу передаются параметры запроса, то возвращается [Future] со списком объектов
   /// соответствующих запросу.
-  Future read(dynamic obj) async {
+  Future read(dynamic obj, {Map<String, String> headers = const {}}) async {
     String path;
     Map<String, String> queryParameters;
 
@@ -64,9 +68,15 @@ abstract class RestResource<T extends JsonEncodable> {
     } else if (obj is Map) {
       path = resourcePath;
       queryParameters = obj;
+    } else {
+      throw (ArgumentError.value(obj, 'obj',
+          'Read criteria must be an ObjectId or Map of query parameters'));
     }
-    final response = await apiClient.get(
-        resourcePath: path, queryParameters: queryParameters);
+    final response = await apiClient.send(RestRequest(
+        method: RestRequestMethod.get,
+        resourcePath: path,
+        queryParameters: queryParameters,
+        headers: headers));
     return processResponse(response);
   }
 
@@ -76,9 +86,15 @@ abstract class RestResource<T extends JsonEncodable> {
   /// параметры, имеющие значение `null` и пустые параметры не изменяются
   ///
   /// Возвращает [Future] с измененным объектом
-  Future<T> update(T obj) async {
-    final response =
-        await apiClient.patch(resourcePath: resourcePath, body: obj.toJson());
+  Future<T> update(T obj, {Map<String, String> headers = const {}}) async {
+    if (!(obj is JsonEncodable))
+      throw ArgumentError.value(
+          obj, 'obj', 'Updating object must be JsonEncodable');
+    final response = await apiClient.send(RestRequest(
+        method: RestRequestMethod.patch,
+        resourcePath: resourcePath,
+        headers: headers,
+        body: obj.toJson()));
     return processResponse(response);
   }
 
@@ -88,9 +104,15 @@ abstract class RestResource<T extends JsonEncodable> {
   /// Если какие-то параметры имеют значение `null` или пустые, то они удаляются
   ///
   /// Возвращает [Future] с измененным объектом
-  Future<T> replace(T obj) async {
-    final response =
-        await apiClient.put(resourcePath: resourcePath, body: obj.toJson());
+  Future<T> replace(T obj, {Map<String, String> headers = const {}}) async {
+    if (!(obj is JsonEncodable))
+      throw ArgumentError.value(
+          obj, 'obj', 'Replacing object must be JsonEncodable');
+    final response = await apiClient.send(RestRequest(
+        method: RestRequestMethod.put,
+        resourcePath: resourcePath,
+        headers: headers,
+        body: obj.toJson()));
     return processResponse(response);
   }
 
@@ -106,7 +128,7 @@ abstract class RestResource<T extends JsonEncodable> {
   ///
   /// Если методу передаются параметры запроса, то удаляются все объекты, удовлетворяющие запросу и
   /// возвращается [Future] со списком удаленных объектов.
-  Future delete(dynamic obj) async {
+  Future delete(dynamic obj, {Map<String, String> headers = const {}}) async {
     String path;
     Map<String, String> queryParameters;
 
@@ -115,18 +137,23 @@ abstract class RestResource<T extends JsonEncodable> {
     } else if (obj is Map) {
       path = resourcePath;
       queryParameters = obj;
+    } else {
+      throw (ArgumentError.value(obj, 'obj',
+          'Delete criteria must be an ObjectId or Map of query parameters'));
     }
-    final response = await apiClient.delete(
-        resourcePath: path, queryParameters: queryParameters);
+    final response = await apiClient.send(RestRequest(
+        method: RestRequestMethod.delete,
+        resourcePath: path,
+        queryParameters: queryParameters,
+        headers: headers));
     return processResponse(response);
   }
 
   @protected
-  dynamic processResponse(ApiResponse response) {
+  dynamic processResponse(RestResponse response) {
     if (response.statusCode != HttpStatus.ok) {
       throw (HttpException(response.reasonPhrase));
     }
-    _responseHeaders = new Map.unmodifiable(response.headers);
     if (response.body is Map) {
       return createObject(response.body);
     } else if (response.body is List) {

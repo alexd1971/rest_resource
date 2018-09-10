@@ -73,9 +73,10 @@ class Users extends RestResource<User> {
 
   /// Осуществляет вход в систему
   Future<User> login(String username, String password) async {
-    final response = await apiClient.post(
+    final response = await apiClient.send(RestRequest(
+        method: RestRequestMethod.post,
         resourcePath: '$resourcePath/login',
-        body: {'username': username, 'password': password});
+        body: {'username': username, 'password': password}));
     if (response.statusCode != HttpStatus.ok) {
       throw (response.reasonPhrase);
     }
@@ -84,7 +85,8 @@ class Users extends RestResource<User> {
 
   /// Осуществляет выход из системы
   Future logout() async {
-    final response = await apiClient.post(resourcePath: '$resourcePath/logout');
+    final response = await apiClient.send(RestRequest(
+        method: RestRequestMethod.post, resourcePath: '$resourcePath/logout'));
     if (response.statusCode != HttpStatus.ok) {
       throw (response.reasonPhrase);
     }
@@ -92,9 +94,14 @@ class Users extends RestResource<User> {
 }
 
 main() async {
-  final apiClient = RestClient(
-      apiUri: Uri.http('api.examle.com', '/'), httpClient: BrowserClient());
-  apiClient.addHeaders({'X-Requested-With': 'XMLHttpRequest'});
+  final apiClient = RestClient(Uri.http('api.examle.com', '/'), BrowserClient(),
+      onBeforeRequest: (request) => request.change(
+          headers: Map.from(request.headers)
+            ..addAll({'X-Requested-With': 'XMLHttpRequest'})),
+      onAfterResponse: (response) {
+        saveToken(response.headers[HttpHeaders.authorizationHeader]);
+        return response;
+      });
 
   final users = Users(apiClient);
 
@@ -131,4 +138,8 @@ main() async {
     // Выполняем что-то для пользователей с именем Bob
     print('${bob.fullName} - ${bob.birthDate}');
   });
+}
+
+saveToken(String tiken) {
+  // Сохранение jwt-токена
 }

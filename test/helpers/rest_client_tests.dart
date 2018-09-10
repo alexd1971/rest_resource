@@ -19,15 +19,21 @@ class RestClientTests {
           spawnHybridUri('helpers/http_server.dart', stayAlive: true);
       final String hostPort = await channel.stream.first;
       apiUri = Uri.http(hostPort, '/');
-      restClient =
-          RestClient(apiUri: apiUri, httpClient: _httpClient);
-      restClient.addHeaders({'X-Requested-With': 'XMLHttpRequest'});
+      restClient = RestClient(apiUri, _httpClient,
+          onBeforeRequest: (request) => request.change(
+              headers: Map.from(request.headers)
+                ..addAll({'X-Requested-With': 'XMLHttpRequest'})),
+          onAfterResponse: (response) =>
+              response.change(headers: {'X-Added-By-Callback': 'value'}));
     });
 
     test('get request', () async {
-      final response = await restClient.get(
-          resourcePath: '/resource', queryParameters: requestParams);
+      final response = await restClient.send(RestRequest(
+          method: RestRequestMethod.get,
+          resourcePath: '/resource',
+          queryParameters: requestParams));
       expect(response.statusCode, HttpStatus.ok);
+      expect(response.headers['X-Added-By-Callback'], 'value');
       expect(response.body, {
         'method': 'GET',
         'uri': apiUri
@@ -37,9 +43,12 @@ class RestClientTests {
     });
 
     test('post request', () async {
-      final response = await restClient.post(
-          resourcePath: '/resource', body: requestParams);
+      final response = await restClient.send(RestRequest(
+          method: RestRequestMethod.post,
+          resourcePath: '/resource',
+          body: requestParams));
       expect(response.statusCode, HttpStatus.ok);
+      expect(response.headers['X-Added-By-Callback'], 'value');
       expect(response.body, {
         'method': 'POST',
         'uri': apiUri
@@ -52,9 +61,12 @@ class RestClientTests {
     });
 
     test('put request', () async {
-      final response = await restClient.put(
-          resourcePath: '/resource', body: requestParams);
+      final response = await restClient.send(RestRequest(
+          method: RestRequestMethod.put,
+          resourcePath: '/resource',
+          body: requestParams));
       expect(response.statusCode, HttpStatus.ok);
+      expect(response.headers['X-Added-By-Callback'], 'value');
       expect(response.body, {
         'method': 'PUT',
         'uri': apiUri
@@ -67,9 +79,12 @@ class RestClientTests {
     });
 
     test('patch request', () async {
-      final response = await restClient.patch(
-          resourcePath: '/resource', body: requestParams);
+      final response = await restClient.send(RestRequest(
+          method: RestRequestMethod.patch,
+          resourcePath: '/resource',
+          body: requestParams));
       expect(response.statusCode, HttpStatus.ok);
+      expect(response.headers['X-Added-By-Callback'], 'value');
       expect(response.body, {
         'method': 'PATCH',
         'uri': apiUri
@@ -82,9 +97,12 @@ class RestClientTests {
     });
 
     test('delete request', () async {
-      final response = await restClient.delete(
-          resourcePath: '/resource', queryParameters: requestParams);
+      final response = await restClient.send(RestRequest(
+          method: RestRequestMethod.delete,
+          resourcePath: '/resource',
+          queryParameters: requestParams));
       expect(response.statusCode, HttpStatus.ok);
+      expect(response.headers['X-Added-By-Callback'], 'value');
       expect(response.body, {
         'method': 'DELETE',
         'uri': apiUri
@@ -94,53 +112,74 @@ class RestClientTests {
     });
 
     test('get request with unauthorized response', () async {
-      final response = await restClient.get(
-          resourcePath: '/unauthorized', queryParameters: requestParams);
+      final response = await restClient.send(RestRequest(
+          method: RestRequestMethod.get,
+          resourcePath: '/unauthorized',
+          queryParameters: requestParams));
       expect(response.statusCode, HttpStatus.unauthorized);
+      expect(response.headers['X-Added-By-Callback'], 'value');
       expect(response.reasonPhrase, '${HttpStatus.unauthorized}-Unauthorized');
     });
 
     test('get request with internal server error response', () async {
-      final response = await restClient.get(
-          resourcePath: '/servererror', queryParameters: requestParams);
+      final response = await restClient.send(RestRequest(
+          method: RestRequestMethod.get,
+          resourcePath: '/servererror',
+          queryParameters: requestParams));
       expect(response.statusCode, HttpStatus.internalServerError);
+      expect(response.headers['X-Added-By-Callback'], 'value');
       expect(response.reasonPhrase,
           '${HttpStatus.internalServerError}-Internal Server Error');
     });
 
     test('post request with unauthorized response', () async {
-      final response = await restClient.post(
-          resourcePath: '/unauthorized', body: requestParams);
+      final response = await restClient.send(RestRequest(
+          method: RestRequestMethod.post,
+          resourcePath: '/unauthorized',
+          body: requestParams));
       expect(response.statusCode, HttpStatus.unauthorized);
+      expect(response.headers['X-Added-By-Callback'], 'value');
       expect(response.reasonPhrase, '${HttpStatus.unauthorized}-Unauthorized');
     });
 
     test('put request with unauthorized response', () async {
-      final response = await restClient.put(
-          resourcePath: '/unauthorized', body: requestParams);
+      final response = await restClient.send(RestRequest(
+          method: RestRequestMethod.put,
+          resourcePath: '/unauthorized',
+          body: requestParams));
       expect(response.statusCode, HttpStatus.unauthorized);
+      expect(response.headers['X-Added-By-Callback'], 'value');
       expect(response.reasonPhrase, '${HttpStatus.unauthorized}-Unauthorized');
     });
 
     test('patch request with unauthorized response', () async {
-      final response = await restClient.patch(
-          resourcePath: '/unauthorized', body: requestParams);
+      final response = await restClient.send(RestRequest(
+          method: RestRequestMethod.patch,
+          resourcePath: '/unauthorized',
+          body: requestParams));
       expect(response.statusCode, HttpStatus.unauthorized);
+      expect(response.headers['X-Added-By-Callback'], 'value');
       expect(response.reasonPhrase, '${HttpStatus.unauthorized}-Unauthorized');
     });
 
     test('delete request with unauthorized response', () async {
-      final response = await restClient.delete(
-          resourcePath: '/unauthorized', queryParameters: requestParams);
+      final response = await restClient.send(RestRequest(
+          method: RestRequestMethod.get,
+          resourcePath: '/unauthorized',
+          queryParameters: requestParams));
       expect(response.statusCode, HttpStatus.unauthorized);
+      expect(response.headers['X-Added-By-Callback'], 'value');
       expect(response.reasonPhrase, '${HttpStatus.unauthorized}-Unauthorized');
     });
 
     test('toEncodable()', () async {
       final encodable = EncodableTest();
-      final response = await restClient
-          .post(resourcePath: '/echo-resource', body: {'test': encodable});
+      final response = await restClient.send(RestRequest(
+          method: RestRequestMethod.post,
+          resourcePath: '/echo-resource',
+          body: {'test': encodable}));
       expect(response.statusCode, HttpStatus.ok);
+      expect(response.headers['X-Added-By-Callback'], 'value');
       expect(response.body, {
         'test': {
           'id': 1234567890,

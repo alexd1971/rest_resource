@@ -113,9 +113,14 @@
 ///     }
 ///
 ///     main() async {
-///       final apiClient = RestClient(
-///           apiUri: Uri.http('api.examle.com', '/'), httpClient: BrowserClient());
-///       apiClient.addHeaders({'X-Requested-With': 'XMLHttpRequest'});
+///       final apiClient = RestClient(Uri.http('api.examle.com', '/'), BrowserClient(),
+///         onBeforeRequest: (request) => request.change(
+///             headers: Map.from(request.headers)
+///               ..addAll({'X-Requested-With': 'XMLHttpRequest'})),
+///         onAfterResponse: (response) {
+///           saveToken(response.headers[HttpHeaders.authorizationHeader]);
+///           return response;
+///         });
 ///
 ///       final users = Users(apiClient);
 ///
@@ -155,7 +160,9 @@
 ///     }
 library rest_resource;
 
-export 'src/api_response.dart';
+export 'src/rest_request.dart';
+export 'src/rest_request_method.dart';
+export 'src/rest_response.dart';
 export 'src/json_encodable.dart';
 export 'src/object_id.dart';
 export 'src/rest_client.dart';

@@ -45,8 +45,10 @@ void main() {
     final channel = spawnHybridUri('helpers/http_server.dart', stayAlive: true);
     final String hostPort = await channel.stream.first;
     final apiUri = Uri.http(hostPort, '/');
-    final apiClient = RestClient(apiUri: apiUri, httpClient: IOClient());
-    apiClient.addHeaders({'X-Requested-With': 'XMLHttpRequest'});
+    final apiClient = RestClient(apiUri, IOClient(),
+        onBeforeRequest: (request) => request.change(
+            headers: Map.from(request.headers)
+              ..addAll({'X-Requested-With': 'XMLHttpRequest'})));
     testResource = TestResource(apiClient: apiClient);
   });
 
