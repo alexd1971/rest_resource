@@ -22,4 +22,8 @@ void main() {
     final id2 = SecondObjectId(1);
     expect(id1 == id2, false);
   });
+
+  test('not null', () {
+    expect((){FirstObjectId(null);}, throwsA(TypeMatcher<ArgumentError>()));
+  });
 }

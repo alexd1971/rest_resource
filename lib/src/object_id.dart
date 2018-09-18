@@ -14,9 +14,12 @@ import 'json_encodable.dart';
 ///       UserId(id): super(id);
 ///     }
 class ObjectId implements JsonEncodable {
-  final _id;
+  var _id;
 
-  ObjectId(id) : _id = id;
+  ObjectId(id) {
+    if (id == null) throw (ArgumentError.notNull('id'));
+    _id = id;
+  }
 
   /// Исходное значение идентификатора
   dynamic get value => _id;
