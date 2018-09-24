@@ -76,7 +76,7 @@ abstract class RestResource<T extends JsonEncodable> {
       path = '$resourcePath/$obj';
     } else if (obj is Map) {
       path = resourcePath;
-      queryParameters = obj;
+      queryParameters = Map<String, String>.from(obj);
     } else {
       throw (ArgumentError.value(obj, 'obj',
           'Read criteria must be an ObjectId or Map of query parameters'));
@@ -145,7 +145,7 @@ abstract class RestResource<T extends JsonEncodable> {
       path = '$resourcePath/$obj';
     } else if (obj is Map) {
       path = resourcePath;
-      queryParameters = obj;
+      queryParameters = Map<String, String>.from(obj);
     } else {
       throw (ArgumentError.value(obj, 'obj',
           'Delete criteria must be an ObjectId or Map of query parameters'));
