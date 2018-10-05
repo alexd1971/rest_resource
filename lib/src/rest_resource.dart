@@ -166,7 +166,7 @@ abstract class RestResource<T extends JsonEncodable> {
     if (response.body is Map) {
       return createObject(response.body);
     } else if (response.body is List) {
-      return response.body.map((json) => createObject(json)).toList();
+      return List<T>.from(response.body.map((json) => createObject(json)));
     } else {
       throw FormatException('Invalid http response format');
     }
